@@ -90,7 +90,7 @@ def test_simple(args):
             pred_disp, _ = disp_to_depth(output[("disp", 0)], 0.000001, 10)
             pred_disp = pred_disp.cpu()[:, 0].numpy()
 
-            disp = outputs[("disp", 0)]
+            disp = output[("disp", 0)]
             disp_resized = torch.nn.functional.interpolate(
                 disp, (original_height * 2, original_width * 2), mode="bilinear", align_corners=False)
 
