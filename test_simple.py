@@ -44,7 +44,7 @@ def test_simple(args):
     model_path = args.model_path
 
     print("-> Loading model from ", model_path)
-    depth_model_path = os.path.join(opt.load_weights_folder, "depth_model.pth")
+    depth_model_path = os.path.join(model_path, "depth_model.pth")
 
     depth_model_dict = torch.load(depth_model_path)
     depth_model = networks.DARES()
@@ -87,7 +87,7 @@ def test_simple(args):
             # PREDICTION
             input_image = input_image.to(device)
             output = depth_model(input_image)
-            pred_disp, _ = disp_to_depth(output[("disp", 0)], opt.min_depth, opt.max_depth)
+            pred_disp, _ = disp_to_depth(output[("disp", 0)], 0, 10)
             pred_disp = pred_disp.cpu()[:, 0].numpy()
 
             disp = outputs[("disp", 0)]
