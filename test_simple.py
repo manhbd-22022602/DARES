@@ -87,7 +87,7 @@ def test_simple(args):
             # PREDICTION
             input_image = input_image.to(device)
             output = depth_model(input_image)
-            pred_disp, _ = disp_to_depth(output[("disp", 0)], 0, 10)
+            pred_disp, _ = disp_to_depth(output[("disp", 0)], 0.000001, 10)
             pred_disp = pred_disp.cpu()[:, 0].numpy()
 
             disp = outputs[("disp", 0)]
