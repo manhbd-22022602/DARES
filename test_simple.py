@@ -32,7 +32,6 @@ def parse_args():
 
     return parser.parse_args()
 
-
 def test_simple(args):
     """Function to predict for a single image or folder of images
     """
@@ -52,20 +51,22 @@ def test_simple(args):
     model_dict = depth_model.state_dict()
 
     depth_model.load_state_dict({k: v for k, v in depth_model_dict.items() if k in model_dict})
-    depth_model.cuda()
+    depth_model.to(device)
     depth_model.eval()
 
     # FINDING INPUT IMAGES
     if os.path.isfile(args.image_path):
         # Only testing on a single image
         paths = [args.image_path]
-        output_directory = os.path.dirname(args.image_path)
     elif os.path.isdir(args.image_path):
         # Searching folder for images
         paths = glob.glob(os.path.join(args.image_path, '*.{}'.format(args.ext)))
-        output_directory = args.image_path
     else:
         raise Exception("Can not find args.image_path: {}".format(args.image_path))
+
+    # Set output directory to /kaggle/working
+    output_directory = "/kaggle/working"
+    os.makedirs(output_directory, exist_ok=True)
 
     print("-> Predicting on {:d} test images".format(len(paths)))
 
@@ -100,22 +101,22 @@ def test_simple(args):
             np.save(name_dest_npy, pred_disp)
 
             # Saving colormapped depth image
-            disp_resized_np = pred_disp.squeeze().cpu().numpy()
+            disp_resized_np = disp_resized.squeeze().cpu().numpy()
             vmax = np.percentile(disp_resized_np, 95)
 
-            normalizer = mpl.colors.Normalize(vmin=disp_resized_np.min(), vmax=vmax) # 归一化到0-1
-            mapper = cm.ScalarMappable(norm=normalizer, cmap='magma') # colormap
+            normalizer = mpl.colors.Normalize(vmin=disp_resized_np.min(), vmax=vmax)
+            mapper = cm.ScalarMappable(norm=normalizer, cmap='magma')
             colormapped_im = (mapper.to_rgba(disp_resized_np)[:, :, :3] * 255).astype(np.uint8)
 
             im = pil.fromarray(colormapped_im)
 
-            name_dest_im = os.path.join(output_directory, "{}.jpeg".format(output_name))
+            name_dest_im = os.path.join(output_directory, "{}_depth.jpeg".format(output_name))
             im.save(name_dest_im, quality=95)
 
             print("   Processed {:d} of {:d} images - saved prediction to {}".format(
                 idx + 1, len(paths), name_dest_im))
 
-    print('->p Done!')
+    print('-> Done!')
 
 
 if __name__ == '__main__':
