@@ -82,7 +82,7 @@ def test_simple(args):
             input_image = pil.open(image_path).convert('RGB')
 
             original_width, original_height = input_image.size
-            input_image = input_image.resize((210, 210), pil.LANCZOS)
+            input_image = input_image.resize((320, 256), pil.LANCZOS)
             input_image = transforms.ToTensor()(input_image).unsqueeze(0)
 
             # PREDICTION
